@@ -67,15 +67,15 @@ jobs:
       - name: Install Bicep CLI
         run: az bicep install
 
-      - name: Generate Resource Group Name
-        id: generate_rg_name
-        run: |
-          echo "Generating a unique resource group name..."
-          TIMESTAMP=$(date +%Y%m%d%H%M%S)
-          COMMON_PART="ci-biab"
-          UNIQUE_RG_NAME="${COMMON_PART}${TIMESTAMP}"
-          echo "RESOURCE_GROUP_NAME=${UNIQUE_RG_NAME}" >> $GITHUB_ENV
-          echo "Generated Resource_GROUP_PREFIX: ${UNIQUE_RG_NAME}" 
+      # - name: Generate Resource Group Name
+      #   id: generate_rg_name
+      #   run: |
+      #     echo "Generating a unique resource group name..."
+      #     TIMESTAMP=$(date +%Y%m%d%H%M%S)
+      #     COMMON_PART="macae-"
+      #     UNIQUE_RG_NAME="${COMMON_PART}${TIMESTAMP}"
+      #     echo "RESOURCE_GROUP_NAME=${UNIQUE_RG_NAME}" >> $GITHUB_ENV
+      #     echo "Generated Resource_GROUP_PREFIX: ${UNIQUE_RG_NAME}" 
       
 
       - name: Check and Create Resource Group
