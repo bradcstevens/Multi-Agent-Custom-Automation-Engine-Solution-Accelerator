@@ -89,7 +89,7 @@ jobs:
             az group create --name ${{ vars.RESOURCE_GROUP_NAME }} --location ${{ env.AZURE_LOCATION }} || { echo "Error creating resource group"; exit 1; }
           else
             echo "Resource group already exists. Deleting..."
-            az group delete --name ${{ vars.RESOURCE_GROUP_NAME }}) --yes
+            az group delete --name ${{ vars.RESOURCE_GROUP_NAME }} --yes
             echo "Resource group deleted."
             echo "Creating a new resource group..."
             az group create --name ${{ vars.RESOURCE_GROUP_NAME }} --location ${{ env.AZURE_LOCATION }} || { echo "Error creating resource group"; exit 1; }
