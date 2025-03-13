@@ -1,6 +1,5 @@
 name: Validate Deployment
 
-
 on:
   workflow_dispatch:
   push:
