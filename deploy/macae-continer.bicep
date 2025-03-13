@@ -2,7 +2,7 @@
 param location string = 'EastUS2' //Fixed for model availability, change back to resourceGroup().location
 
 @description('Location for OpenAI resources.')
-param azureOpenAILocation string = 'EastUS' //Fixed for model availability
+param azureOpenAILocation string = 'EastUS2' //Fixed for model availability
 
 
 

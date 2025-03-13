@@ -1,6 +1,5 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "languageVersion": "2.0",
   "contentVersion": "1.0.0.0",
   "metadata": {
     "_generator": {
@@ -19,7 +18,7 @@
     },
     "azureOpenAILocation": {
       "type": "string",
-      "defaultValue": "EastUS",
+      "defaultValue": "EastUS2",
       "metadata": {
         "description": "Location for OpenAI resources."
       }
@@ -78,6 +77,13 @@
       "metadata": {
         "description": "The size of the resources to deploy, defaults to a mini size"
       }
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "lab-macae-lab",
+      "metadata": {
+        "description": "The name of the resource group."
+      }
     }
   },
   "variables": {
@@ -90,6 +96,12 @@
     "aoaiApiVersion": "2024-08-01-preview"
   },
   "resources": {
+    "resourceGroup": {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "eastus2"
+    },
     "openai::gpt4o": {
       "type": "Microsoft.CognitiveServices/accounts/deployments",
       "apiVersion": "2023-10-01-preview",
