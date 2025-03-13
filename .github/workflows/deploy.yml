@@ -82,8 +82,6 @@ jobs:
         id: check_create_rg
         run: |
           set -e
-          echo "Setting the resource group name..."
-          export RESOURCE_GROUP_NAME="${{ vars.RESOURCE_GROUP_NAME }}"
           echo "Checking if resource group exists..."
           rg_exists=$(az group exists --name ${{ vars.RESOURCE_GROUP_NAME }})
           if [ "$rg_exists" = "false" ]; then
@@ -91,7 +89,7 @@ jobs:
             az group create --name ${{ vars.RESOURCE_GROUP_NAME }} --location ${{ env.AZURE_LOCATION }} || { echo "Error creating resource group"; exit 1; }
           else
             echo "Resource group already exists. Deleting..."
-            az group delete --name <resourceGroupName> --yes
+            az group delete --name ${{ vars.RESOURCE_GROUP_NAME }}) --yes
             echo "Resource group deleted."
             echo "Creating a new resource group..."
             az group create --name ${{ vars.RESOURCE_GROUP_NAME }} --location ${{ env.AZURE_LOCATION }} || { echo "Error creating resource group"; exit 1; }
