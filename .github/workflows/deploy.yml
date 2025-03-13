@@ -67,33 +67,28 @@ jobs:
       - name: Install Bicep CLI
         run: az bicep install
 
-      # - name: Generate Resource Group Name
-      #   id: generate_rg_name
-      #   run: |
-      #     echo "Generating a unique resource group name..."
-      #     TIMESTAMP=$(date +%Y%m%d%H%M%S)
-      #     COMMON_PART="macae-"
-      #     UNIQUE_RG_NAME="${COMMON_PART}${TIMESTAMP}"
-      #     echo "RESOURCE_GROUP_NAME=${UNIQUE_RG_NAME}" >> $GITHUB_ENV
-      #     echo "Generated Resource_GROUP_PREFIX: ${UNIQUE_RG_NAME}" 
+      - name: Generate Resource Group Name
+        id: generate_rg_name
+        run: |
+          echo "Generating a unique resource group name..."
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          COMMON_PART="macae-"
+          UNIQUE_RG_NAME="${COMMON_PART}${TIMESTAMP}"
+          echo "RESOURCE_GROUP_NAME=${UNIQUE_RG_NAME}" >> $GITHUB_ENV
+          echo "Generated Resource_GROUP_PREFIX: ${UNIQUE_RG_NAME}" 
       
 
       - name: Check and Create Resource Group
         id: check_create_rg
         run: |
-          set -e
+          set -e  
           echo "Checking if resource group exists..."
-          rg_exists=$(az group exists --name ${{ vars.RESOURCE_GROUP_NAME }})
+          rg_exists=$(az group exists --name ${{ env.RESOURCE_GROUP_NAME }})
           if [ "$rg_exists" = "false" ]; then
             echo "Resource group does not exist. Creating..."
-            az group create --name ${{ vars.RESOURCE_GROUP_NAME }} --location ${{ env.AZURE_LOCATION }} || { echo "Error creating resource group"; exit 1; }
+            az group create --name ${{ env.RESOURCE_GROUP_NAME }} --location ${{ env.AZURE_LOCATION }} || { echo "Error creating resource group"; exit 1; }
           else
-            echo "Resource group already exists. Deleting..."
-            az group delete --name ${{ vars.RESOURCE_GROUP_NAME }} --yes
-            echo "Resource group deleted."
-            echo "Creating a new resource group..."
-            az group create --name ${{ vars.RESOURCE_GROUP_NAME }} --location ${{ env.AZURE_LOCATION }} || { echo "Error creating resource group"; exit 1; }
-            echo "Resource group created."
+            echo "Resource group already exists."
           fi
 
 
@@ -102,7 +97,7 @@ jobs:
         run: |
           set -e
           az deployment group create \
-            --resource-group ${{ vars.RESOURCE_GROUP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
             --template-file deploy/macae.bicep \
             --parameters azureOpenAILocation=${{env.AZURE_LOCATION }} cosmosLocation=${{env.AZURE_LOCATION }}
 
@@ -132,39 +127,39 @@ jobs:
 
 
           set -e
-          echo "Fetching OpenAI resource from resource group ${{ vars.RESOURCE_GROUP_NAME }}..."
+          echo "Fetching OpenAI resource from resource group ${{ env.RESOURCE_GROUP_NAME }}..."
           
           # Run the az resource list command to get the OpenAI resource name
-          openai_resource_name=$(az resource list --resource-group ${{ vars.RESOURCE_GROUP_NAME }} --resource-type "Microsoft.CognitiveServices/accounts" --query "[0].name" -o tsv)
+          openai_resource_name=$(az resource list --resource-group ${{ env.RESOURCE_GROUP_NAME }} --resource-type "Microsoft.CognitiveServices/accounts" --query "[0].name" -o tsv)
 
           if [ -z "$openai_resource_name" ]; then
-            echo "No OpenAI resource found in resource group ${{ vars.RESOURCE_GROUP_NAME }}."
+            echo "No OpenAI resource found in resource group ${{ env.RESOURCE_GROUP_NAME }}."
             exit 1
           else
             echo "OPENAI_RESOURCE_NAME=${openai_resource_name}" >> $GITHUB_ENV
             echo "OpenAI resource name: ${openai_resource_name}" 
           fi
 
-          echo "Fetching Azure App Service resource from resource group ${{ vars.RESOURCE_GROUP_NAME }}..."
+          echo "Fetching Azure App Service resource from resource group ${{ env.RESOURCE_GROUP_NAME }}..."
           
           # Run the az resource list command to get the App Service resource name
-          app_service_name=$(az resource list --resource-group ${{ vars.RESOURCE_GROUP_NAME }} --resource-type "Microsoft.Web/sites" --query "[0].name" -o tsv)
+          app_service_name=$(az resource list --resource-group ${{ env.RESOURCE_GROUP_NAME }} --resource-type "Microsoft.Web/sites" --query "[0].name" -o tsv)
 
           if [ -z "$app_service_name" ]; then
-            echo "No Azure App Service resource found in resource group ${{ vars.RESOURCE_GROUP_NAME }}."
+            echo "No Azure App Service resource found in resource group ${{ env.RESOURCE_GROUP_NAME }}."
             exit 1
           else
             echo "APP_SERVICE_NAME=${app_service_name}" >> $GITHUB_ENV
             echo "Azure App Service resource name: ${app_service_name}" 
           fi
 
-          echo "Fetching container registry resource from resource group ${{ vars.RESOURCE_GROUP_NAME }}..."
+          echo "Fetching container registry resource from resource group ${{ env.RESOURCE_GROUP_NAME }}..."
 
           # Fetch Azure Container Registry name
-          acr_name=$(az acr list --resource-group ${{ vars.RESOURCE_GROUP_NAME }} --query "[0].name" -o tsv)
+          acr_name=$(az acr list --resource-group ${{ env.RESOURCE_GROUP_NAME }} --query "[0].name" -o tsv)
 
           if [ -z "$acr_name" ]; then
-            echo "No Azure Container Registry found in resource group ${{ vars.RESOURCE_GROUP_NAME }}."
+            echo "No Azure Container Registry found in resource group ${{ env.RESOURCE_GROUP_NAME }}."
             exit 1
           else
             echo "ACR_NAME=${acr_name}" >> $GITHUB_ENV
@@ -197,7 +192,7 @@ jobs:
           echo "Frontend image build completed successfully."
 
           # Add the new container to the website
-          az webapp config container set --resource-group ${{ vars.RESOURCE_GROUP_NAME }} --name ${frontend_container_app_name} --container-image-name ${acr_name}.azurecr.io/frontend:latest --container-registry-url https://${acr_name}.azurecr.io
+          az webapp config container set --resource-group ${{ env.RESOURCE_GROUP_NAME }} --name ${frontend_container_app_name} --container-image-name ${acr_name}.azurecr.io/frontend:latest --container-registry-url https://${acr_name}.azurecr.io
                   
           
       - name: Delete Bicep Deployment
@@ -205,14 +200,14 @@ jobs:
         run: |
           set -e  
           echo "Checking if resource group exists..."
-          rg_exists=$(az group exists --name ${{ vars.RESOURCE_GROUP_NAME }})
+          rg_exists=$(az group exists --name ${{ env.RESOURCE_GROUP_NAME }})
           if [ "$rg_exists" = "true" ]; then
             echo "Resource group exist. Cleaning..."
             az group delete \
-                --name ${{ vars.RESOURCE_GROUP_NAME }} \
+                --name ${{ env.RESOURCE_GROUP_NAME }} \
                 --yes \
                 --no-wait
-            echo "Resource group deleted...  ${{ vars.RESOURCE_GROUP_NAME }}"
+            echo "Resource group deleted...  ${{ env.RESOURCE_GROUP_NAME }}"
           else
             echo "Resource group does not exists."
           fi
@@ -239,7 +234,7 @@ jobs:
             resource_found=false
 
             # Get the list of resources in YAML format again on each retry
-            resource_list=$(az resource list --resource-group ${{ vars.RESOURCE_GROUP_NAME }} --output yaml)
+            resource_list=$(az resource list --resource-group ${{ env.RESOURCE_GROUP_NAME }} --output yaml)
 
             # Iterate through the resources to check
             for resource in "${resources_to_check[@]}"; do
@@ -279,7 +274,7 @@ jobs:
 
           # Purge OpenAI Resource
           echo "Purging the OpenAI Resource..."
-          if ! az resource delete --ids /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/providers/Microsoft.CognitiveServices/locations/eastus2/resourceGroups/${{ vars.RESOURCE_GROUP_NAME }}/deletedAccounts/${{ env.OPENAI_RESOURCE_NAME }} --verbose; then
+          if ! az resource delete --ids /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/providers/Microsoft.CognitiveServices/locations/eastus2/resourceGroups/${{ env.RESOURCE_GROUP_NAME }}/deletedAccounts/${{ env.OPENAI_RESOURCE_NAME }} --verbose; then
             echo "Failed to purge openai resource: ${{ env.OPENAI_RESOURCE_NAME }}"
           else
             echo "Purged the openai resource: ${{ env.OPENAI_RESOURCE_NAME }}"
