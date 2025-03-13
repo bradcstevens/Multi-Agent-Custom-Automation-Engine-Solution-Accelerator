@@ -354,7 +354,7 @@ resource frontendAppService 'Microsoft.Web/sites@2021-02-01' = {
       ]
     }
   }
-  dependsOn: [containerApp]
+  // dependsOn: [containerApp]
   identity: {
     type: 'SystemAssigned, UserAssigned'
     userAssignedIdentities: {
