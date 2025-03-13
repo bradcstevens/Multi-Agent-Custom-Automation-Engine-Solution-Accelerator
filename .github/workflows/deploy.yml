@@ -83,7 +83,7 @@ jobs:
         run: |
           set -e
           echo "Setting the resource group name..."
-          echo "RESOURCE_GROUP_NAME=${{ env.RESOURCE_GROUP_NAME }}" >> $GITHUB_ENV
+          echo "RESOURCE_GROUP_NAME=${{ vars.RESOURCE_GROUP_NAME }}" >> $GITHUB_ENV
           echo "Checking if resource group exists..."
           rg_exists=$(az group exists --name ${{ env.RESOURCE_GROUP_NAME }})
           if [ "$rg_exists" = "false" ]; then
