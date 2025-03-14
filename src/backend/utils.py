@@ -364,8 +364,8 @@ def rai_success(description: str) -> bool:
             },
             {"role": "user", "content": description},
         ],
-        "temperature": 0.7,
-        "top_p": 0.95,
+        # "temperature": 0.7,
+        # "top_p": 0.95,
         "max_tokens": 800,
     }
     # Send request
