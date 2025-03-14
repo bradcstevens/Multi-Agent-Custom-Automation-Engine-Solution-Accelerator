@@ -19,7 +19,7 @@ param tags object = {}
 param developerPrincipalId string
 
 var uniqueNameFormat = '${prefix}-{0}-${uniqueString(resourceGroup().id, prefix)}'
-var aoaiApiVersion = '2024-08-01-preview'
+var aoaiApiVersion = '2024-12-01-preview'
 
 resource openai 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
   name: format(uniqueNameFormat, 'openai')
@@ -32,8 +32,8 @@ resource openai 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
   properties: {
     customSubDomainName: format(uniqueNameFormat, 'openai')
   }
-  resource gpt4o 'deployments' = {
-    name: 'gpt-4o'
+  resource o3mini 'deployments' = {
+    name: 'o3-mini'
     sku: {
       name: 'GlobalStandard'
       capacity: 15
@@ -41,8 +41,8 @@ resource openai 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
     properties: {
       model: {
         format: 'OpenAI'
-        name: 'gpt-4o'
-        version: '2024-08-06'
+        name: '03-mini'
+        version: '2025-01-31'
       }
       versionUpgradeOption: 'NoAutoUpgrade'
     }
@@ -128,6 +128,6 @@ output COSMOSDB_ENDPOINT string = cosmos.properties.documentEndpoint
 output COSMOSDB_DATABASE string = cosmos::autogenDb.name
 output COSMOSDB_CONTAINER string = cosmos::autogenDb::memoryContainer.name
 output AZURE_OPENAI_ENDPOINT string = openai.properties.endpoint
-output AZURE_OPENAI_DEPLOYMENT_NAME string = openai::gpt4o.name
+output AZURE_OPENAI_DEPLOYMENT_NAME string = openai::o3mini.name
 output AZURE_OPENAI_API_VERSION string = aoaiApiVersion
 

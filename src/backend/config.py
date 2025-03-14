@@ -98,7 +98,7 @@ class Config:
                     "https://cognitiveservices.azure.com/.default"
                 ),
                 model_capabilities=model_capabilities,
-                temperature=0,
+                # temperature=0,
             )
         else:
             # Fallback behavior to use API key
@@ -109,7 +109,7 @@ class Config:
                 azure_endpoint=Config.AZURE_OPENAI_ENDPOINT,
                 api_key=Config.AZURE_OPENAI_API_KEY,
                 model_capabilities=model_capabilities,
-                temperature=0,
+                # temperature=0,
             )
 
         return Config.__aoai_chatCompletionClient

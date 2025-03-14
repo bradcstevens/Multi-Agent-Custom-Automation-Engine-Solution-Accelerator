@@ -41,7 +41,7 @@
     "resourceSize": {
       "type": "object",
       "properties": {
-        "gpt4oCapacity": {
+        "o3miniCapacity": {
           "type": "int"
         },
         "cosmosThroughput": {
@@ -66,7 +66,7 @@
         }
       },
       "defaultValue": {
-        "gpt4oCapacity": 50,
+        "o3miniCapacity": 50,
         "cosmosThroughput": 1000,
         "containerAppSize": {
           "cpu": "2.0",
@@ -87,21 +87,21 @@
     "backendDockerImageURL": "[format('{0}.azurecr.io/macaebackend:{1}', variables('resgistryName'), variables('appVersion'))]",
     "frontendDockerImageURL": "[format('{0}.azurecr.io/macaefrontend:{1}', variables('resgistryName'), variables('appVersion'))]",
     "uniqueNameFormat": "[format('{0}-{{0}}-{1}', parameters('prefix'), uniqueString(resourceGroup().id, parameters('prefix')))]",
-    "aoaiApiVersion": "2024-08-01-preview"
+    "aoaiApiVersion": "2024-12-01-preview"
   },
   "resources": {
-    "openai::gpt4o": {
+    "openai::o3mini": {
       "type": "Microsoft.CognitiveServices/accounts/deployments",
-      "apiVersion": "2023-10-01-preview",
-      "name": "[format('{0}/{1}', format(variables('uniqueNameFormat'), 'openai'), 'gpt-4o')]",
+      "apiVersion": "2024-12-01-preview",
+      "name": "[format('{0}/{1}', format(variables('uniqueNameFormat'), 'openai'), 'o3-mini')]",
       "sku": {
         "name": "GlobalStandard",
-        "capacity": "[parameters('resourceSize').gpt4oCapacity]"
+        "capacity": "[parameters('resourceSize').o3miniCapacity]"
       },
       "properties": {
         "model": {
           "format": "OpenAI",
-          "name": "gpt-4o",
+          "name": "o3-mini",
           "version": "2024-08-06"
         },
         "versionUpgradeOption": "NoAutoUpgrade"
@@ -357,7 +357,7 @@
                 },
                 {
                   "name": "AZURE_OPENAI_DEPLOYMENT_NAME",
-                  "value": "gpt-4o"
+                  "value": "o3-mini"
                 },
                 {
                   "name": "AZURE_OPENAI_API_VERSION",
@@ -381,7 +381,7 @@
         "cosmos::autogenDb",
         "containerAppEnv",
         "cosmos",
-        "openai::gpt4o",
+        "openai::o3mini",
         "cosmos::autogenDb::memoryContainer",
         "openai",
         "pullIdentity"

@@ -168,10 +168,10 @@ To add your newly created backend image:
         value: <Azure OpenAI endpoint>
 
         name: 'AZURE_OPENAI_DEPLOYMENT_NAME'
-        value: 'gpt-4o'
+        value: 'o3-mini'
 
         name: 'AZURE_OPENAI_API_VERSION'
-        value: '2024-08-01-preview'
+        value: '2024-02-15-preview'
 		Note: Version should be updated based on latest available
 
         name: 'FRONTEND_SITE_NAME'

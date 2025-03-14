@@ -14,7 +14,7 @@ param tags object = {}
 
 @description('The size of the resources to deploy, defaults to a mini size')
 param resourceSize {
-  gpt4oCapacity: int
+  o3miniCapacity: int
   cosmosThroughput: int
   containerAppSize: {
     cpu: string
@@ -23,7 +23,7 @@ param resourceSize {
     maxReplicas: int
   }
 } = {
-  gpt4oCapacity: 50
+  o3miniCapacity: 50
   cosmosThroughput: 1000
   containerAppSize: {
     cpu: '2.0'
@@ -43,7 +43,7 @@ var backendDockerImageURL = '${resgistryName}.azurecr.io/macaebackend:${appVersi
 var frontendDockerImageURL = '${resgistryName}.azurecr.io/macaefrontend:${appVersion}'
 
 var uniqueNameFormat = '${prefix}-{0}-${uniqueString(resourceGroup().id, prefix)}'
-var aoaiApiVersion = '2024-08-01-preview'
+var aoaiApiVersion = '2024-12-01-preview'
 
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
@@ -79,17 +79,17 @@ resource openai 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
   properties: {
     customSubDomainName: format(uniqueNameFormat, 'openai')
   }
-  resource gpt4o 'deployments' = {
-    name: 'gpt-4o'
+  resource o3mini 'deployments' = {
+    name: 'o3mini'
     sku: {
       name: 'GlobalStandard'
-      capacity: resourceSize.gpt4oCapacity
+      capacity: resourceSize.o3miniCapacity
     }
     properties: {
       model: {
         format: 'OpenAI'
-        name: 'gpt-4o'
-        version: '2024-08-06'
+        name: 'o3-mini'
+        version: '2025-01-31'
       }
       versionUpgradeOption: 'NoAutoUpgrade'
     }
@@ -269,7 +269,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
             }
             {
               name: 'AZURE_OPENAI_DEPLOYMENT_NAME'
-              value: openai::gpt4o.name
+              value: openai::o3mini.name
             }
             {
               name: 'AZURE_OPENAI_API_VERSION'

@@ -17,7 +17,7 @@ param tags object = {}
 
 @description('The size of the resources to deploy, defaults to a mini size')
 param resourceSize {
-  gpt4oCapacity: int
+  o3miniCapacity: int
   cosmosThroughput: int
   containerAppSize: {
     cpu: string
@@ -26,7 +26,7 @@ param resourceSize {
     maxReplicas: int
   }
 } = {
-  gpt4oCapacity: 50
+  o3miniCapacity: 50
   cosmosThroughput: 1000
   containerAppSize: {
     cpu: '2.0'
@@ -37,14 +37,14 @@ param resourceSize {
 }
 
 
-var appVersion = 'latest'
-var resgistryName = 'biabcontainerreg'
-var dockerRegistryUrl = 'https://${resgistryName}.azurecr.io'
+// var appVersion = 'latest'
+// var resgistryName = 'acrmacaelab'
+// var dockerRegistryUrl = 'https://${resgistryName}.azurecr.io'
 var placeholderImage = 'hello-world:latest'
 
 var uniqueNameFormat = '${prefix}-{0}-${uniqueString(resourceGroup().id, prefix)}'
 var uniqueShortNameFormat = '${toLower(prefix)}{0}${uniqueString(resourceGroup().id, prefix)}'
-var aoaiApiVersion = '2024-08-01-preview'
+// var aoaiApiVersion = '2024-12-01-preview'
 
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
@@ -80,17 +80,17 @@ resource openai 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
   properties: {
     customSubDomainName: format(uniqueNameFormat, 'openai')
   }
-  resource gpt4o 'deployments' = {
-    name: 'gpt-4o'
+  resource o3mini 'deployments' = {
+    name: 'o3-mini'
     sku: {
       name: 'GlobalStandard'
-      capacity: resourceSize.gpt4oCapacity
+      capacity: resourceSize.o3miniCapacity
     }
     properties: {
       model: {
         format: 'OpenAI'
-        name: 'gpt-4o'
-        version: '2024-08-06'
+        name: 'o3-mini'
+        version: '2025-01-31'
       }
       versionUpgradeOption: 'NoAutoUpgrade'
     }
@@ -271,37 +271,38 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
           }
-          env: [
-            {
-              name: 'COSMOSDB_ENDPOINT'
-              value: cosmos.properties.documentEndpoint
-            }
-            {
-              name: 'COSMOSDB_DATABASE'
-              value: cosmos::autogenDb.name
-            }
-            {
-              name: 'COSMOSDB_CONTAINER'
-              value: cosmos::autogenDb::memoryContainer.name
-            }
-            {
-              name: 'AZURE_OPENAI_ENDPOINT'
-              value: openai.properties.endpoint
-            }
-            {
-              name: 'AZURE_OPENAI_DEPLOYMENT_NAME'
-              value: openai::gpt4o.name
-            }
-            {
-              name: 'AZURE_OPENAI_API_VERSION'
-              value: aoaiApiVersion
-            }
-            {
-              name: 'FRONTEND_SITE_NAME'
-              value: 'https://${format(uniqueNameFormat, 'frontend')}.azurewebsites.net'
-            }
-          ]
         }
+        //   env: [
+        //     {
+        //       name: 'COSMOSDB_ENDPOINT'
+        //       value: cosmos.properties.documentEndpoint
+        //     }
+        //     {
+        //       name: 'COSMOSDB_DATABASE'
+        //       value: cosmos::autogenDb.name
+        //     }
+        //     {
+        //       name: 'COSMOSDB_CONTAINER'
+        //       value: cosmos::autogenDb::memoryContainer.name
+        //     }
+        //     {
+        //       name: 'AZURE_OPENAI_ENDPOINT'
+        //       value: openai.properties.endpoint
+        //     }
+        //     {
+        //       name: 'AZURE_OPENAI_DEPLOYMENT_NAME'
+        //       value: openai::o3mini.name
+        //     }
+        //     {
+        //       name: 'AZURE_OPENAI_API_VERSION'
+        //       value: aoaiApiVersion
+        //     }
+        //     {
+        //       name: 'FRONTEND_SITE_NAME'
+        //       value: 'https://${format(uniqueNameFormat, 'frontend')}.azurewebsites.net'
+        //     }
+        //   ]
+        // }
       ]
     }
     
