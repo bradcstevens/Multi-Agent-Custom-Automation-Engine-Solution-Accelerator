@@ -198,8 +198,7 @@ async def create_azure_architecture_diagram(
             if from_var and to_var:
                 if "label" in rel:
                     code.append(
-                        f"    {from_var} >> Edge(label='{
-                            rel['label']}') >> {to_var}")
+                        f"    {from_var} >> Edge(label='{rel['label']}') >> {to_var}")
                 else:
                     code.append(f"    {from_var} >> {to_var}")
         code.append("")
@@ -212,10 +211,7 @@ async def create_azure_architecture_diagram(
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes components from categories: {
-            ', '.join(
-                components.keys())} with {
-            len(relationships)} relationships."
+        return f"Azure architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes components from categories: {', '.join(components.keys())} with {len(relationships)} relationships."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -315,8 +311,7 @@ async def create_azure_network_diagram(
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure network diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
-            len(vnet_config)} VNets with their subnets and security groups."
+        return f"Azure network diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(vnet_config)} VNets with their subnets and security groups."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -416,9 +411,7 @@ async def create_azure_serverless_diagram(
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure serverless architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
-            len(functions)} function apps and {
-            len(storage_services)} storage services with event relationships."
+        return f"Azure serverless architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(functions)} function apps and {len(storage_services)} storage services with event relationships."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -551,10 +544,7 @@ async def create_azure_microservices_diagram(
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure microservices architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
-            len(services)} microservices with {
-            'API Management, ' if api_management else ''}{
-            'Load Balancer, ' if include_loadbalancer else ''}and communication patterns."
+        return f"Azure microservices architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(services)} microservices with {'API Management, ' if api_management else ''}{'Load Balancer, ' if include_loadbalancer else ''}and communication patterns."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -650,10 +640,7 @@ async def create_azure_data_pipeline_diagram(
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure data pipeline architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
-            len(data_sources)} data sources, {
-            len(processing_services)} processing services, and {
-            len(storage_destinations)} storage destinations with detailed data flows."
+        return f"Azure data pipeline architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(data_sources)} data sources, {len(processing_services)} processing services, and {len(storage_destinations)} storage destinations with detailed data flows."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 

@@ -183,6 +183,37 @@ jobs:
           az acr build -r ${acr_name} -t ${backend_build_image_tag} ./src/backend
           echo "Backend image build completed successfully."
 
+          # Get the container registry credentials
+          acr_username=$(az acr credential show -n ${acr_name} --query "username" -o tsv)
+          acr_password=$(az acr credential show -n ${acr_name} --query "passwords[0].value" -o tsv)
+          
+          # Get required environment variables
+          echo "Getting required environment variables..."
+          openai_endpoint=$(az cognitiveservices account show --name ${{ env.OPENAI_RESOURCE_NAME }} --resource-group ${{ env.RESOURCE_GROUP_NAME }} --query "properties.endpoint" -o tsv)
+          cosmos_endpoint=$(az cosmosdb show --name $(az cosmosdb list --resource-group ${{ env.RESOURCE_GROUP_NAME }} --query "[0].name" -o tsv) --resource-group ${{ env.RESOURCE_GROUP_NAME }} --query "properties.documentEndpoint" -o tsv)
+
+          # Configure the backend container app
+          # echo "Configuring the backend container app..."
+          # az containerapp create \
+          #   --name "macae-backend" \
+          #   --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
+          #   --image ${acr_name}.azurecr.io/${backend_build_image_tag} \
+          #   --registry-server ${acr_name}.azurecr.io \
+          #   --registry-username ${acr_username} \
+          #   --registry-password ${acr_password} \
+          #   --environment $(az containerapp env list --resource-group ${{ env.RESOURCE_GROUP_NAME }} --query "[0].name" -o tsv) \
+          #   --target-port 8000 \
+          #   --ingress external \
+          #   --env-vars \
+          #     "COSMOSDB_ENDPOINT=${cosmos_endpoint}" \
+          #     "COSMOSDB_DATABASE=autogen" \
+          #     "COSMOSDB_CONTAINER=memory" \
+          #     "AZURE_OPENAI_ENDPOINT=${openai_endpoint}" \
+          #     "AZURE_OPENAI_DEPLOYMENT_NAME=o3-mini" \
+          #     "AZURE_OPENAI_MODEL_NAME=o3-mini" \
+          #     "AZURE_OPENAI_API_VERSION=2024-12-01-preview" \
+          #     "FRONTEND_SITE_NAME=https://${{ env.APP_SERVICE_NAME }}.azurewebsites.net"
+
           frontend_container_app_name="${{ env.APP_SERVICE_NAME }}"
           frontend_build_image_tag="frontend:latest"
 
@@ -193,6 +224,13 @@ jobs:
 
           # Add the new container to the website
           az webapp config container set --resource-group ${{ env.RESOURCE_GROUP_NAME }} --name ${frontend_container_app_name} --container-image-name ${acr_name}.azurecr.io/frontend:latest --container-registry-url https://${acr_name}.azurecr.io
+
+          # # Get the backend URL for the frontend
+          # backend_url="https://$(az containerapp show --name macae-backend --resource-group ${{ env.RESOURCE_GROUP_NAME }} --query "properties.configuration.ingress.fqdn" -o tsv)"
+          # echo "Backend URL: ${backend_url}"
+          
+          # # Update the frontend app settings
+          # az webapp config appsettings set --resource-group ${{ env.RESOURCE_GROUP_NAME }} --name ${frontend_container_app_name} --settings BACKEND_API_URL="${backend_url}"
                   
           
       - name: Delete Bicep Deployment
