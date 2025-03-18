@@ -212,4 +212,4 @@ class SolutionArchitectAgent(BaseAgent):
             solution_architect_tools,
             solution_architect_tool_agent_id,
             "You are an AI Solution Architect Agent. You specialize in designing system architectures, evaluating technology stacks, creating integration strategies, and developing technical solutions that address business requirements. You help organizations plan and implement efficient, scalable, and secure technical infrastructures."
-        ) 
+        )

@@ -218,4 +218,4 @@ class VerificationAssistantAgent(BaseAgent):
             verification_assistant_tools,
             verification_assistant_tool_agent_id,
             "You are an AI Verification Assistant Agent. You specialize in validating, assessing, and verifying various aspects of technology solutions including requirements, architectures, security, performance, compliance, code quality, and documentation. You help ensure that solutions meet standards, work as expected, and align with business objectives."
-        ) 
+        )

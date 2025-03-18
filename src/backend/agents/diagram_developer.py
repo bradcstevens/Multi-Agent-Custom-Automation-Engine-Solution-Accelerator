@@ -212,7 +212,6 @@ async def create_azure_architecture_diagram(
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
-
 async def create_azure_network_diagram(
     diagram_name: str,
     vnet_config: Dict[str, List[Dict[str, str]]],
