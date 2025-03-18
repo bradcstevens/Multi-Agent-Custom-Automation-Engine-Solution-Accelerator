@@ -218,7 +218,7 @@ class PlannerAgent(RoutedAgent):
 
         Limit the plan to 6 steps or less.
 
-        Choose from HumanAgent, HrAgent, MarketingAgent, ProcurementAgent, ProductAgent, TechSupportAgent, GenericAgent ONLY for planning your steps.
+        Choose from HumanAgent, DiagramDeveloperAgent, SolutionArchitectAgent, VerificationAgent, GenericAgent ONLY for planning your steps.
 
         """
         return instruction_template

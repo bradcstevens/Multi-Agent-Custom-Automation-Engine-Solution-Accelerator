@@ -26,13 +26,11 @@ async def design_architecture_diagram(
     layers_str = ", ".join(layers)
     return f"Architecture diagram created for '{project_name}' using {architecture_style} style with layers: {layers_str}."
 
-
 async def create_sequence_diagram(
     interaction_name: str, actors: List[str], steps: int
 ) -> str:
     actors_str = ", ".join(actors)
     return f"Sequence diagram created for '{interaction_name}' showing interaction between {actors_str} in {steps} steps."
-
 
 async def design_entity_relationship_diagram(
     database_name: str, entities: List[str], relationship_types: List[str]
@@ -41,7 +39,6 @@ async def design_entity_relationship_diagram(
     relationships_str = ", ".join(relationship_types)
     return f"Entity-relationship diagram created for '{database_name}' with entities ({entities_str}) and relationship types: {relationships_str}."
 
-
 async def create_network_topology_diagram(
     network_name: str, nodes: List[str], connection_types: List[str]
 ) -> str:
@@ -49,13 +46,11 @@ async def create_network_topology_diagram(
     connections_str = ", ".join(connection_types)
     return f"Network topology diagram created for '{network_name}' with nodes ({nodes_str}) and connection types: {connections_str}."
 
-
 async def design_process_flow_diagram(
     process_name: str, steps: List[str], decision_points: int
 ) -> str:
     steps_str = ", ".join(steps)
     return f"Process flow diagram created for '{process_name}' with steps ({steps_str}) and {decision_points} decision points."
-
 
 async def create_component_diagram(
     system_name: str, components: List[str], interfaces: List[str]
@@ -80,13 +75,11 @@ async def create_class_diagram(
     relationships_str = ", ".join(relationships)
     return f"Class diagram created for '{system_name}' with classes ({classes_str}) and relationships: {relationships_str}."
 
-
 async def design_state_diagram(
     component_name: str, states: List[str], transitions: int
 ) -> str:
     states_str = ", ".join(states)
     return f"State diagram created for '{component_name}' with states ({states_str}) and {transitions} transitions."
-
 
 async def create_use_case_diagram(
     system_name: str, actors: List[str], use_cases: List[str]
