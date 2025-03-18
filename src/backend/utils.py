@@ -19,6 +19,9 @@ from agents.procurement import ProcurementAgent, get_procurement_tools
 from agents.product import ProductAgent, get_product_tools
 from agents.generic import GenericAgent, get_generic_tools
 from agents.tech_support import TechSupportAgent, get_tech_support_tools
+from agents.diagram_developer import DiagramDeveloperAgent, get_diagram_developer_tools
+from agents.solution_architect import SolutionArchitectAgent, get_solution_architect_tools
+from agents.verification_assistant import VerificationAssistantAgent, get_verification_assistant_tools
 
 # from agents.misc import MiscAgent
 from config import Config
@@ -43,6 +46,9 @@ procurement_tools = get_procurement_tools()
 product_tools = get_product_tools()
 generic_tools = get_generic_tools()
 tech_support_tools = get_tech_support_tools()
+diagram_developer_tools = get_diagram_developer_tools()
+solution_architect_tools = get_solution_architect_tools()
+verification_assistant_tools = get_verification_assistant_tools()
 
 
 # Initialize the Azure OpenAI model client
@@ -60,47 +66,59 @@ async def initialize_runtime_and_context(
     session_id: Optional[str] = None, user_id: str = None
 ) -> Tuple[SingleThreadedAgentRuntime, CosmosBufferedChatCompletionContext]:
     """
-    Initializes agents and context for a given session.
+    Initialize a new runtime and context for a session.
 
     Args:
-        session_id (Optional[str]): The session ID.
+        session_id: Unique identifier for the session
+        user_id: The id of the user creating the session
 
     Returns:
-        Tuple[SingleThreadedAgentRuntime, CosmosBufferedChatCompletionContext]: The runtime and context for the session.
+        Tuple of runtime and context for the session
     """
-    global runtime_dict
-    global aoai_model_client
-
-    if user_id is None:
-        raise ValueError(
-            "The 'user_id' parameter cannot be None. Please provide a valid user ID."
-        )
-
+    # If the session_id is not provided, generate a random UUID for the session
     if session_id is None:
         session_id = str(uuid.uuid4())
 
-    if session_id in runtime_dict:
-        return runtime_dict[session_id]
+    # If the user_id is not provided, generate a random UUID for the user
+    if user_id is None:
+        user_id = str(uuid.uuid4())
 
-    # Initialize agents with AgentIds that include session_id to ensure uniqueness
-    planner_agent_id = AgentId("planner_agent", session_id)
-    human_agent_id = AgentId("human_agent", session_id)
-    hr_agent_id = AgentId("hr_agent", session_id)
-    hr_tool_agent_id = AgentId("hr_tool_agent", session_id)
-    marketing_agent_id = AgentId("marketing_agent", session_id)
-    marketing_tool_agent_id = AgentId("marketing_tool_agent", session_id)
-    procurement_agent_id = AgentId("procurement_agent", session_id)
-    procurement_tool_agent_id = AgentId("procurement_tool_agent", session_id)
-    product_agent_id = AgentId("product_agent", session_id)
-    generic_agent_id = AgentId("generic_agent", session_id)
-    product_tool_agent_id = AgentId("product_tool_agent", session_id)
-    generic_tool_agent_id = AgentId("generic_tool_agent", session_id)
-    tech_support_agent_id = AgentId("tech_support_agent", session_id)
-    tech_support_tool_agent_id = AgentId("tech_support_tool_agent", session_id)
-    group_chat_manager_id = AgentId("group_chat_manager", session_id)
+    # Create agent IDs with unique session prefixes
+    group_chat_manager_id = AgentId(f"{session_id}_group_chat_manager")
+    planner_agent_id = AgentId(f"{session_id}_planner_agent")
+    hr_agent_id = AgentId(f"{session_id}_hr_agent")
+    human_agent_id = AgentId(f"{session_id}_human_agent")
+    marketing_agent_id = AgentId(f"{session_id}_marketing_agent")
+    procurement_agent_id = AgentId(f"{session_id}_procurement_agent")
+    product_agent_id = AgentId(f"{session_id}_product_agent")
+    generic_agent_id = AgentId(f"{session_id}_generic_agent")
+    tech_support_agent_id = AgentId(f"{session_id}_tech_support_agent")
+    diagram_developer_agent_id = AgentId(f"{session_id}_diagram_developer_agent")
+    solution_architect_agent_id = AgentId(f"{session_id}_solution_architect_agent")
+    verification_assistant_agent_id = AgentId(f"{session_id}_verification_assistant_agent")
 
     # Initialize the context for the session
-    cosmos_memory = CosmosBufferedChatCompletionContext(session_id, user_id)
+    try:
+        cosmos_endpoint_url = os.environ.get("AZURE_COSMOS_ENDPOINT", None)
+        if cosmos_endpoint_url is None:
+            raise ValueError("AZURE_COSMOS_ENDPOINT environment variable is not set")
+
+        # Get Azure OpenAI embedding client
+        embedding_client = Config.GetAzureOpenAIEmbeddingClient()
+
+        # Create the cosmos memory context
+        credential = DefaultAzureCredential()
+        cosmos_memory = CosmosBufferedChatCompletionContext(
+            credential=credential,
+            endpoint_url=cosmos_endpoint_url,
+            database_name="AutomationDatastore",
+            container_name="SessionMemory",
+            session_id=session_id,
+            embedding_client=embedding_client,
+        )
+    except Exception as ex:
+        logging.exception(f"Error initializing session context: {ex}")
+        raise
 
     # Initialize the runtime for the session
     runtime = SingleThreadedAgentRuntime(tracer_provider=None)
@@ -136,6 +154,21 @@ async def initialize_runtime_and_context(
     )
     await ToolAgent.register(
         runtime,
+        "diagram_developer_tool_agent",
+        lambda: ToolAgent("Diagram Developer tool execution agent", diagram_developer_tools),
+    )
+    await ToolAgent.register(
+        runtime,
+        "solution_architect_tool_agent",
+        lambda: ToolAgent("Solution Architect tool execution agent", solution_architect_tools),
+    )
+    await ToolAgent.register(
+        runtime,
+        "verification_assistant_tool_agent",
+        lambda: ToolAgent("Verification Assistant tool execution agent", verification_assistant_tools),
+    )
+    await ToolAgent.register(
+        runtime,
         "misc_tool_agent",
         lambda: ToolAgent("Misc tool execution agent", []),
     )
@@ -155,10 +188,12 @@ async def initialize_runtime_and_context(
                     hr_agent_id,
                     marketing_agent_id,
                     procurement_agent_id,
-                    procurement_agent_id,
                     product_agent_id,
                     generic_agent_id,
                     tech_support_agent_id,
+                    diagram_developer_agent_id,
+                    solution_architect_agent_id,
+                    verification_assistant_agent_id,
                 ]
             ],
             retrieve_all_agent_tools(),
@@ -173,7 +208,7 @@ async def initialize_runtime_and_context(
             user_id,
             cosmos_memory,
             hr_tools,
-            hr_tool_agent_id,
+            AgentId(f"{session_id}_hr_tool_agent"),
         ),
     )
     await MarketingAgent.register(
@@ -185,7 +220,7 @@ async def initialize_runtime_and_context(
             user_id,
             cosmos_memory,
             marketing_tools,
-            marketing_tool_agent_id,
+            AgentId(f"{session_id}_marketing_tool_agent"),
         ),
     )
     await ProcurementAgent.register(
@@ -197,7 +232,7 @@ async def initialize_runtime_and_context(
             user_id,
             cosmos_memory,
             procurement_tools,
-            procurement_tool_agent_id,
+            AgentId(f"{session_id}_procurement_tool_agent"),
         ),
     )
     await ProductAgent.register(
@@ -209,7 +244,7 @@ async def initialize_runtime_and_context(
             user_id,
             cosmos_memory,
             product_tools,
-            product_tool_agent_id,
+            AgentId(f"{session_id}_product_tool_agent"),
         ),
     )
     await GenericAgent.register(
@@ -221,7 +256,7 @@ async def initialize_runtime_and_context(
             user_id,
             cosmos_memory,
             generic_tools,
-            generic_tool_agent_id,
+            AgentId(f"{session_id}_generic_tool_agent"),
         ),
     )
     await TechSupportAgent.register(
@@ -233,7 +268,43 @@ async def initialize_runtime_and_context(
             user_id,
             cosmos_memory,
             tech_support_tools,
-            tech_support_tool_agent_id,
+            AgentId(f"{session_id}_tech_support_tool_agent"),
+        ),
+    )
+    await DiagramDeveloperAgent.register(
+        runtime,
+        diagram_developer_agent_id.type,
+        lambda: DiagramDeveloperAgent(
+            aoai_model_client,
+            session_id,
+            user_id,
+            cosmos_memory,
+            diagram_developer_tools,
+            AgentId(f"{session_id}_diagram_developer_tool_agent"),
+        ),
+    )
+    await SolutionArchitectAgent.register(
+        runtime,
+        solution_architect_agent_id.type,
+        lambda: SolutionArchitectAgent(
+            aoai_model_client,
+            session_id,
+            user_id,
+            cosmos_memory,
+            solution_architect_tools,
+            AgentId(f"{session_id}_solution_architect_tool_agent"),
+        ),
+    )
+    await VerificationAssistantAgent.register(
+        runtime,
+        verification_assistant_agent_id.type,
+        lambda: VerificationAssistantAgent(
+            aoai_model_client,
+            session_id,
+            user_id,
+            cosmos_memory,
+            verification_assistant_tools,
+            AgentId(f"{session_id}_verification_assistant_tool_agent"),
         ),
     )
     await HumanAgent.register(
@@ -241,7 +312,7 @@ async def initialize_runtime_and_context(
         human_agent_id.type,
         lambda: HumanAgent(cosmos_memory, user_id, group_chat_manager_id),
     )
-
+    
     agent_ids = {
         BAgentType.planner_agent: planner_agent_id,
         BAgentType.human_agent: human_agent_id,
@@ -251,6 +322,9 @@ async def initialize_runtime_and_context(
         BAgentType.product_agent: product_agent_id,
         BAgentType.generic_agent: generic_agent_id,
         BAgentType.tech_support_agent: tech_support_agent_id,
+        BAgentType.diagram_developer_agent: diagram_developer_agent_id,
+        BAgentType.solution_architect_agent: solution_architect_agent_id,
+        BAgentType.verification_agent: verification_assistant_agent_id,
     }
     await GroupChatManager.register(
         runtime,
@@ -275,6 +349,9 @@ def retrieve_all_agent_tools() -> List[Dict[str, Any]]:
     procurement_tools: List[Tool] = get_procurement_tools()
     product_tools: List[Tool] = get_product_tools()
     tech_support_tools: List[Tool] = get_tech_support_tools()
+    diagram_developer_tools: List[Tool] = get_diagram_developer_tools()
+    solution_architect_tools: List[Tool] = get_solution_architect_tools()
+    verification_assistant_tools: List[Tool] = get_verification_assistant_tools()
 
     functions = []
 
@@ -327,6 +404,39 @@ def retrieve_all_agent_tools() -> List[Dict[str, Any]]:
         functions.append(
             {
                 "agent": "ProductAgent",
+                "function": tool.name,
+                "description": tool.description,
+                "arguments": str(tool.schema["parameters"]["properties"]),
+            }
+        )
+        
+    # Add DiagramDeveloperAgent functions
+    for tool in diagram_developer_tools:
+        functions.append(
+            {
+                "agent": "DiagramDeveloperAgent",
+                "function": tool.name,
+                "description": tool.description,
+                "arguments": str(tool.schema["parameters"]["properties"]),
+            }
+        )
+        
+    # Add SolutionArchitectAgent functions
+    for tool in solution_architect_tools:
+        functions.append(
+            {
+                "agent": "SolutionArchitectAgent",
+                "function": tool.name,
+                "description": tool.description,
+                "arguments": str(tool.schema["parameters"]["properties"]),
+            }
+        )
+        
+    # Add VerificationAssistantAgent functions
+    for tool in verification_assistant_tools:
+        functions.append(
+            {
+                "agent": "VerificationAssistantAgent",
                 "function": tool.name,
                 "description": tool.description,
                 "arguments": str(tool.schema["parameters"]["properties"]),
