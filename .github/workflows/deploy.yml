@@ -3,7 +3,7 @@ name: Validate Deployment
 on:
   workflow_dispatch:
   push:
-    branches: ["main"]
+    branches: ["main", "solution-architect-agents"]
 
 jobs:
   deploy:
