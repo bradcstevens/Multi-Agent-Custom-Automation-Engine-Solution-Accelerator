@@ -26,11 +26,13 @@ async def design_architecture_diagram(
     layers_str = ", ".join(layers)
     return f"Architecture diagram created for '{project_name}' using {architecture_style} style with layers: {layers_str}."
 
+
 async def create_sequence_diagram(
     interaction_name: str, actors: List[str], steps: int
 ) -> str:
     actors_str = ", ".join(actors)
     return f"Sequence diagram created for '{interaction_name}' showing interaction between {actors_str} in {steps} steps."
+
 
 async def design_entity_relationship_diagram(
     database_name: str, entities: List[str], relationship_types: List[str]
@@ -39,6 +41,7 @@ async def design_entity_relationship_diagram(
     relationships_str = ", ".join(relationship_types)
     return f"Entity-relationship diagram created for '{database_name}' with entities ({entities_str}) and relationship types: {relationships_str}."
 
+
 async def create_network_topology_diagram(
     network_name: str, nodes: List[str], connection_types: List[str]
 ) -> str:
@@ -46,11 +49,13 @@ async def create_network_topology_diagram(
     connections_str = ", ".join(connection_types)
     return f"Network topology diagram created for '{network_name}' with nodes ({nodes_str}) and connection types: {connections_str}."
 
+
 async def design_process_flow_diagram(
     process_name: str, steps: List[str], decision_points: int
 ) -> str:
     steps_str = ", ".join(steps)
     return f"Process flow diagram created for '{process_name}' with steps ({steps_str}) and {decision_points} decision points."
+
 
 async def create_component_diagram(
     system_name: str, components: List[str], interfaces: List[str]
@@ -75,11 +80,13 @@ async def create_class_diagram(
     relationships_str = ", ".join(relationships)
     return f"Class diagram created for '{system_name}' with classes ({classes_str}) and relationships: {relationships_str}."
 
+
 async def design_state_diagram(
     component_name: str, states: List[str], transitions: int
 ) -> str:
     states_str = ", ".join(states)
     return f"State diagram created for '{component_name}' with states ({states_str}) and {transitions} transitions."
+
 
 async def create_use_case_diagram(
     system_name: str, actors: List[str], use_cases: List[str]
@@ -90,8 +97,10 @@ async def create_use_case_diagram(
 
 
 async def design_data_flow_diagram(
-    system_name: str, processes: List[str], data_stores: List[str], external_entities: List[str]
-) -> str:
+        system_name: str,
+        processes: List[str],
+        data_stores: List[str],
+        external_entities: List[str]) -> str:
     processes_str = ", ".join(processes)
     stores_str = ", ".join(data_stores)
     entities_str = ", ".join(external_entities)
@@ -123,20 +132,20 @@ async def create_container_diagram(
 
 
 async def create_azure_architecture_diagram(
-    diagram_name: str, 
+    diagram_name: str,
     components: Dict[str, List[str]],
     relationships: List[Dict[str, str]]
 ) -> str:
     """
     Create Azure architecture diagram using Python Diagrams library.
-    
+
     Args:
         diagram_name: Name of the diagram
         components: Dictionary mapping Azure service categories to lists of services
                    e.g. {"compute": ["AzureFunction", "AppService"], "database": ["CosmosDB"]}
         relationships: List of dictionaries defining relationships between components
                        e.g. [{"from": "compute.AzureFunction", "to": "database.CosmosDB", "label": "stores data"}]
-    
+
     Returns:
         Path to the generated diagram file
     """
@@ -145,7 +154,7 @@ async def create_azure_architecture_diagram(
     unique_id = str(uuid.uuid4())[:8]
     file_name = f"{diagram_name.replace(' ', '_')}_{unique_id}"
     diagram_path = os.path.join(temp_dir, f"{file_name}.py")
-    
+
     # Generate Python code for the diagram
     code = [
         "from diagrams import Diagram, Cluster, Edge",
@@ -168,7 +177,7 @@ async def create_azure_architecture_diagram(
         "",
         f"with Diagram('{diagram_name}', filename='{file_name}', show=False):",
     ]
-    
+
     # Create component variables
     component_vars = {}
     for category, services in components.items():
@@ -179,7 +188,7 @@ async def create_azure_architecture_diagram(
                 component_vars[f"{category}.{service}"] = var_name
                 code.append(f"    {var_name} = {service}('{service}')")
             code.append("")
-    
+
     # Create relationships
     if relationships:
         code.append("    # Relationships")
@@ -188,22 +197,28 @@ async def create_azure_architecture_diagram(
             to_var = component_vars.get(rel["to"])
             if from_var and to_var:
                 if "label" in rel:
-                    code.append(f"    {from_var} >> Edge(label='{rel['label']}') >> {to_var}")
+                    code.append(
+                        f"    {from_var} >> Edge(label='{
+                            rel['label']}') >> {to_var}")
                 else:
                     code.append(f"    {from_var} >> {to_var}")
         code.append("")
-    
+
     # Write the code to a file
     with open(diagram_path, "w") as f:
         f.write("\n".join(code))
-    
+
     # Execute the code to generate the diagram
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes components from categories: {', '.join(components.keys())} with {len(relationships)} relationships."
+        return f"Azure architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes components from categories: {
+            ', '.join(
+                components.keys())} with {
+            len(relationships)} relationships."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
+
 
 async def create_azure_network_diagram(
     diagram_name: str,
@@ -212,14 +227,14 @@ async def create_azure_network_diagram(
 ) -> str:
     """
     Create Azure network topology diagram.
-    
+
     Args:
         diagram_name: Name of the diagram
         vnet_config: Dictionary mapping VNet names to subnet configurations
-                    e.g. {"Production VNet": [{"name": "Web Subnet", "cidr": "10.0.1.0/24"}, 
+                    e.g. {"Production VNet": [{"name": "Web Subnet", "cidr": "10.0.1.0/24"},
                                              {"name": "Data Subnet", "cidr": "10.0.2.0/24"}]}
         edge_devices: Optional list of edge device names to include
-    
+
     Returns:
         Path to the generated diagram file
     """
@@ -228,7 +243,7 @@ async def create_azure_network_diagram(
     unique_id = str(uuid.uuid4())[:8]
     file_name = f"{diagram_name.replace(' ', '_')}_{unique_id}"
     diagram_path = os.path.join(temp_dir, f"{file_name}.py")
-    
+
     # Generate Python code for the diagram
     code = [
         "from diagrams import Diagram, Cluster, Edge",
@@ -239,23 +254,23 @@ async def create_azure_network_diagram(
         "",
         f"with Diagram('{diagram_name}', filename='{file_name}', show=False):"
     ]
-    
+
     # Add a Virtual Network Gateway if we have multiple VNets
     if len(vnet_config) > 1:
         code.append("    vpn_gateway = VirtualNetworkGateway('VPN Gateway')")
         code.append("")
-    
+
     # Create VNets and Subnets
     vnet_vars = {}
     for vnet_name, subnets in vnet_config.items():
         vnet_var = f"vnet_{vnet_name.lower().replace(' ', '_')}"
         vnet_vars[vnet_name] = vnet_var
         code.append(f"    with Cluster('{vnet_name}'):")
-        
+
         # Add Network Security Group
         code.append(f"        nsg_{vnet_var} = NetworkSecurityGroup('NSG')")
         code.append("")
-        
+
         # Add Subnets
         subnet_vars = []
         for subnet in subnets:
@@ -269,14 +284,14 @@ async def create_azure_network_diagram(
             code.append(f"            vm_{subnet_var} = VirtualMachine('VM')")
             code.append(f"            {subnet_var} >> vm_{subnet_var}")
             code.append("")
-    
+
     # Connect VNets if we have multiple
     if len(vnet_config) > 1:
         code.append("    # Connect VNets through Gateway")
         for vnet_name, vnet_var in vnet_vars.items():
             code.append(f"    vpn_gateway >> nsg_{vnet_var}")
         code.append("")
-    
+
     # Add Edge Devices if specified
     if edge_devices:
         code.append("    # Edge Devices")
@@ -291,16 +306,17 @@ async def create_azure_network_diagram(
         for device in edge_devices:
             device_var = f"device_{device.lower().replace(' ', '_')}"
             code.append(f"    {device_var} >> nsg_{first_vnet}")
-    
+
     # Write the code to a file
     with open(diagram_path, "w") as f:
         f.write("\n".join(code))
-    
+
     # Execute the code to generate the diagram
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure network diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(vnet_config)} VNets with their subnets and security groups."
+        return f"Azure network diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
+            len(vnet_config)} VNets with their subnets and security groups."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -313,7 +329,7 @@ async def create_azure_serverless_diagram(
 ) -> str:
     """
     Create Azure serverless architecture diagram.
-    
+
     Args:
         diagram_name: Name of the diagram
         functions: List of dictionaries describing Azure Functions
@@ -321,7 +337,7 @@ async def create_azure_serverless_diagram(
         storage_services: List of Azure storage services to include (e.g., "StorageAccount", "CosmosDB")
         event_triggers: List of event relationships between services
                        e.g. [{"source": "EventHub", "targets": ["ProcessOrder", "UpdateInventory"]}]
-    
+
     Returns:
         Path to the generated diagram file
     """
@@ -330,7 +346,7 @@ async def create_azure_serverless_diagram(
     unique_id = str(uuid.uuid4())[:8]
     file_name = f"{diagram_name.replace(' ', '_')}_{unique_id}"
     diagram_path = os.path.join(temp_dir, f"{file_name}.py")
-    
+
     # Generate Python code for the diagram
     code = [
         "from diagrams import Diagram, Cluster, Edge",
@@ -342,7 +358,7 @@ async def create_azure_serverless_diagram(
         "",
         f"with Diagram('{diagram_name}', filename='{file_name}', show=False):"
     ]
-    
+
     # Create function apps with cluster
     code.append("    with Cluster('Function Apps'):")
     function_vars = {}
@@ -353,7 +369,7 @@ async def create_azure_serverless_diagram(
         function_vars[func_name] = func_var
         code.append(f"        {func_var} = FunctionApp('{func_name}\\n({func_type})')")
     code.append("")
-    
+
     # Create storage services
     code.append("    # Storage Services")
     storage_vars = {}
@@ -362,13 +378,13 @@ async def create_azure_serverless_diagram(
         storage_vars[service] = service_var
         code.append(f"    {service_var} = {service}('{service}')")
     code.append("")
-    
+
     # Create event trigger relationships
     code.append("    # Event Relationships")
     for event in event_triggers:
         source = event["source"]
         targets = event["targets"]
-        
+
         # If source is a storage service
         if source in storage_vars:
             source_var = storage_vars[source]
@@ -377,29 +393,32 @@ async def create_azure_serverless_diagram(
             source_var = f"{source.lower().replace(' ', '_')}"
             code.append(f"    {source_var} = {source}('{source}')")
             storage_vars[source] = source_var
-        
+
         # Create relationships to target functions
         for target in targets:
             if target in function_vars:
                 target_var = function_vars[target]
-                code.append(f"    {source_var} >> Edge(label='Trigger') >> {target_var}")
-    
+                code.append(
+                    f"    {source_var} >> Edge(label='Trigger') >> {target_var}")
+
     # Add connections from functions to storage
     code.append("")
     code.append("    # Function to Storage Connections")
     for func_name, func_var in function_vars.items():
         for service, service_var in storage_vars.items():
             code.append(f"    {func_var} >> Edge(label='Uses') >> {service_var}")
-    
+
     # Write the code to a file
     with open(diagram_path, "w") as f:
         f.write("\n".join(code))
-    
+
     # Execute the code to generate the diagram
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure serverless architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(functions)} function apps and {len(storage_services)} storage services with event relationships."
+        return f"Azure serverless architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
+            len(functions)} function apps and {
+            len(storage_services)} storage services with event relationships."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -413,7 +432,7 @@ async def create_azure_microservices_diagram(
 ) -> str:
     """
     Create Azure microservices architecture diagram.
-    
+
     Args:
         diagram_name: Name of the diagram
         services: List of dictionaries describing microservices
@@ -422,7 +441,7 @@ async def create_azure_microservices_diagram(
         include_loadbalancer: Whether to include a load balancer
         communication_patterns: List of communication patterns between services
                                e.g. [{"from": "UserService", "to": "OrderService", "pattern": "HTTP"}]
-    
+
     Returns:
         Path to the generated diagram file
     """
@@ -431,7 +450,7 @@ async def create_azure_microservices_diagram(
     unique_id = str(uuid.uuid4())[:8]
     file_name = f"{diagram_name.replace(' ', '_')}_{unique_id}"
     diagram_path = os.path.join(temp_dir, f"{file_name}.py")
-    
+
     # Map service types to appropriate Azure service classes
     service_type_map = {
         "Container": "ContainerInstance",
@@ -442,7 +461,7 @@ async def create_azure_microservices_diagram(
         "Service Fabric": "ServiceFabric",
         "Container App": "ContainerInstance"
     }
-    
+
     # Generate Python code for the diagram
     code = [
         "from diagrams import Diagram, Cluster, Edge",
@@ -455,40 +474,41 @@ async def create_azure_microservices_diagram(
         "",
         f"with Diagram('{diagram_name}', filename='{file_name}', show=False):"
     ]
-    
+
     # Create clients and frontend
     code.append("    # Clients and Frontend")
-    
+
     if include_loadbalancer:
         code.append("    lb = LoadBalancer('Load Balancer')")
-    
+
     if api_management:
         code.append("    apim = APIManagement('API Management')")
         if include_loadbalancer:
             code.append("    lb >> apim")
-    
+
     code.append("")
-    
+
     # Create service instances
     code.append("    # Microservices")
     service_vars = {}
     for service in services:
         service_name = service["name"]
         service_type = service["type"]
-        azure_class = service_type_map.get(service_type, "AppService")  # Default to AppService if type not found
-        
+        # Default to AppService if type not found
+        azure_class = service_type_map.get(service_type, "AppService")
+
         service_var = f"{service_name.lower().replace(' ', '_')}"
         service_vars[service_name] = service_var
         code.append(f"    {service_var} = {azure_class}('{service_name}')")
-        
+
         # Connect services to API Management
         if api_management:
             code.append(f"    apim >> {service_var}")
         elif include_loadbalancer:  # Connect directly to load balancer if no API Management
             code.append(f"    lb >> {service_var}")
-    
+
     code.append("")
-    
+
     # Create communication patterns between services
     if communication_patterns:
         code.append("    # Service Communications")
@@ -496,39 +516,45 @@ async def create_azure_microservices_diagram(
             from_service = pattern["from"]
             to_service = pattern["to"]
             comm_pattern = pattern.get("pattern", "Request")
-            
+
             if from_service in service_vars and to_service in service_vars:
                 from_var = service_vars[from_service]
                 to_var = service_vars[to_service]
-                code.append(f"    {from_var} >> Edge(label='{comm_pattern}') >> {to_var}")
-        
+                code.append(
+                    f"    {from_var} >> Edge(label='{comm_pattern}') >> {to_var}")
+
         code.append("")
-    
+
     # Add a database layer if needed
-    if any("database" in service.get("dependencies", []).lower() for service in services if "dependencies" in service):
+    if any("database" in service.get("dependencies", []).lower()
+           for service in services if "dependencies" in service):
         code.append("    # Databases")
         code.append("    cosmos = CosmosDB('Cosmos DB')")
         code.append("    sqldb = SQLDatabase('SQL Database')")
         code.append("")
-        
+
         # Connect services to databases based on dependencies
         for service in services:
-            if "dependencies" in service and "database" in service["dependencies"].lower():
+            if "dependencies" in service and "database" in service["dependencies"].lower(
+            ):
                 service_var = service_vars[service["name"]]
                 if "sql" in service["dependencies"].lower():
                     code.append(f"    {service_var} >> sqldb")
                 else:
                     code.append(f"    {service_var} >> cosmos")
-    
+
     # Write the code to a file
     with open(diagram_path, "w") as f:
         f.write("\n".join(code))
-    
+
     # Execute the code to generate the diagram
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure microservices architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(services)} microservices with {'API Management, ' if api_management else ''}{'Load Balancer, ' if include_loadbalancer else ''}and communication patterns."
+        return f"Azure microservices architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
+            len(services)} microservices with {
+            'API Management, ' if api_management else ''}{
+            'Load Balancer, ' if include_loadbalancer else ''}and communication patterns."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -542,7 +568,7 @@ async def create_azure_data_pipeline_diagram(
 ) -> str:
     """
     Create Azure data pipeline architecture diagram.
-    
+
     Args:
         diagram_name: Name of the diagram
         data_sources: List of data source services
@@ -553,7 +579,7 @@ async def create_azure_data_pipeline_diagram(
                             e.g. ["DataLakeStorage", "CosmosDB", "Synapse"]
         flow_steps: List of flow steps between services
                    e.g. [{"from": "IoTHub", "to": "StreamAnalytics", "label": "Stream"}]
-    
+
     Returns:
         Path to the generated diagram file
     """
@@ -562,7 +588,7 @@ async def create_azure_data_pipeline_diagram(
     unique_id = str(uuid.uuid4())[:8]
     file_name = f"{diagram_name.replace(' ', '_')}_{unique_id}"
     diagram_path = os.path.join(temp_dir, f"{file_name}.py")
-    
+
     # Generate Python code for the diagram
     code = [
         "from diagrams import Diagram, Cluster, Edge",
@@ -574,7 +600,7 @@ async def create_azure_data_pipeline_diagram(
         "",
         f"with Diagram('{diagram_name}', filename='{file_name}', show=False):"
     ]
-    
+
     # Create data sources
     code.append("    with Cluster('Data Sources'):")
     source_vars = {}
@@ -583,7 +609,7 @@ async def create_azure_data_pipeline_diagram(
         source_vars[source] = source_var
         code.append(f"        {source_var} = {source}('{source}')")
     code.append("")
-    
+
     # Create processing services
     code.append("    with Cluster('Data Processing'):")
     processing_vars = {}
@@ -592,7 +618,7 @@ async def create_azure_data_pipeline_diagram(
         processing_vars[service] = service_var
         code.append(f"        {service_var} = {service}('{service}')")
     code.append("")
-    
+
     # Create storage destinations
     code.append("    with Cluster('Data Storage'):")
     storage_vars = {}
@@ -601,30 +627,33 @@ async def create_azure_data_pipeline_diagram(
         storage_vars[destination] = dest_var
         code.append(f"        {dest_var} = {destination}('{destination}')")
     code.append("")
-    
+
     # Create flow relationships
     code.append("    # Data Flow")
     all_vars = {**source_vars, **processing_vars, **storage_vars}
-    
+
     for flow in flow_steps:
         from_service = flow["from"]
         to_service = flow["to"]
         label = flow.get("label", "Flow")
-        
+
         if from_service in all_vars and to_service in all_vars:
             from_var = all_vars[from_service]
             to_var = all_vars[to_service]
             code.append(f"    {from_var} >> Edge(label='{label}') >> {to_var}")
-    
+
     # Write the code to a file
     with open(diagram_path, "w") as f:
         f.write("\n".join(code))
-    
+
     # Execute the code to generate the diagram
     try:
         os.system(f"python {diagram_path}")
         output_path = os.path.join(temp_dir, f"{file_name}.png")
-        return f"Azure data pipeline architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {len(data_sources)} data sources, {len(processing_services)} processing services, and {len(storage_destinations)} storage destinations with detailed data flows."
+        return f"Azure data pipeline architecture diagram '{diagram_name}' created successfully. The diagram has been saved to {output_path}. The diagram includes {
+            len(data_sources)} data sources, {
+            len(processing_services)} processing services, and {
+            len(storage_destinations)} storage destinations with detailed data flows."
     except Exception as e:
         return f"Failed to create diagram: {str(e)}"
 
@@ -767,4 +796,4 @@ Your specific expertise includes:
 5. Designing data pipeline architecture diagrams showing data flow between Azure services
 
 You understand Azure services, their use cases, and proper diagramming conventions for cloud architecture. You create code that generates PNG diagram files that can be shared and presented to stakeholders."""
-        ) 
+        )
