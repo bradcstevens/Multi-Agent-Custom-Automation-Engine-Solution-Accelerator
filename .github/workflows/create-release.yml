@@ -2,7 +2,7 @@ on:
    push:
     branches:
       - main
-
+      - solution-architect-agents
 permissions:
   contents: write
   pull-requests: write

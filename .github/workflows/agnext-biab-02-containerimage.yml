@@ -1,7 +1,7 @@
 name: Create and publish a Docker image
 on:
   push:
-    branches: ['main', 'test', 'release']
+    branches: ['main', 'test', 'release', 'solution-architect-agents']
     paths:
       - 'agnext-biab-02/**'
       - '.github/workflows/agnext-biab-02-containerimage.yml'
