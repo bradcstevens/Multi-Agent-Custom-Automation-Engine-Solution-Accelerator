@@ -261,7 +261,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'backend'
-          image: '${acr.properties.loginServer}/backend:latest'
+          image: 'https://${acr.properties.loginServer}/backend:latest'
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
