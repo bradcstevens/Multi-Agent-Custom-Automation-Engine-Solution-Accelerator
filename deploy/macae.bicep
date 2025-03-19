@@ -36,6 +36,14 @@ param resourceSize {
   }
 }
 
+var appVersion = 'latest'
+var registryName = format(uniqueNameFormat, 'acr')
+var dockerRegistryUrl = 'https://${registryName}.azurecr.io'
+
+@description('URL for frontend docker image')
+var backendDockerImageURL = '${registryName}.azurecr.io/macaebackend:${appVersion}'
+var frontendDockerImageURL = '${registryName}.azurecr.io/macaefrontend:${appVersion}'
+
 var uniqueNameFormat = '${prefix}-{0}-${uniqueString(resourceGroup().id, prefix)}'
 var uniqueShortNameFormat = '${toLower(prefix)}{0}${uniqueString(resourceGroup().id, prefix)}'
 
@@ -262,7 +270,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'backend'
-          image: 'https://${format(uniqueNameFormat, 'acr')}.azurecr.io/backend:latest'
+          image: backendDockerImageURL
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
@@ -332,11 +340,11 @@ resource frontendAppService 'Microsoft.Web/sites@2021-02-01' = {
     serverFarmId: frontendAppServicePlan.id
     reserved: true
     siteConfig: {
-      linuxFxVersion:''//'DOCKER|${frontendDockerImageURL}'
+      linuxFxVersion:'DOCKER|${frontendDockerImageURL}'
       appSettings: [
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'
-          value: acr.properties.loginServer
+          value: dockerRegistryUrl
         }
         {
           name: 'WEBSITES_PORT'

@@ -74,7 +74,7 @@ jobs:
           echo "Generating a unique resource group name..."
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           COMMON_PART="macae"
-          UNIQUE_RG_NAME="${COMMON_PART}${TIMESTAMP}"
+          UNIQUE_RG_NAME="-${COMMON_PART}-${TIMESTAMP}"
           echo "RESOURCE_GROUP_NAME=${UNIQUE_RG_NAME}" >> $GITHUB_ENV
           echo "Generated Resource_GROUP_PREFIX: ${UNIQUE_RG_NAME}" 
       
