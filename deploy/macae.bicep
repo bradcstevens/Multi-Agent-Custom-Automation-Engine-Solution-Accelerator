@@ -41,8 +41,8 @@ var registryName = format(uniqueNameFormat, 'acr')
 var dockerRegistryUrl = 'https://${registryName}.azurecr.io'
 
 @description('URL for frontend docker image')
-var backendDockerImageURL = '${registryName}.azurecr.io/macaebackend:${appVersion}'
-var frontendDockerImageURL = '${registryName}.azurecr.io/macaefrontend:${appVersion}'
+var backendDockerImageURL = '${registryName}.azurecr.io/backend:${appVersion}'
+var frontendDockerImageURL = '${registryName}.azurecr.io/frontend:${appVersion}'
 
 var uniqueNameFormat = '${prefix}-{0}-${uniqueString(resourceGroup().id, prefix)}'
 var uniqueShortNameFormat = '${toLower(prefix)}{0}${uniqueString(resourceGroup().id, prefix)}'
