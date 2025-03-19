@@ -36,15 +36,10 @@ param resourceSize {
   }
 }
 
-
-// var appVersion = 'latest'
-// var resgistryName = 'acrmacaelab'
-// var dockerRegistryUrl = 'https://${resgistryName}.azurecr.io'
-var placeholderImage = 'hello-world:latest'
-
 var uniqueNameFormat = '${prefix}-{0}-${uniqueString(resourceGroup().id, prefix)}'
 var uniqueShortNameFormat = '${toLower(prefix)}{0}${uniqueString(resourceGroup().id, prefix)}'
-// var aoaiApiVersion = '2024-12-01-preview'
+
+var aoaiApiVersion = '2024-12-01-preview'
 
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
@@ -266,43 +261,46 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'backend'
-          image: placeholderImage
+          image: 'backend:latest'
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
           }
+          env: [
+            {
+              name: 'COSMOSDB_ENDPOINT'
+              value: cosmos.properties.documentEndpoint
+            }
+            {
+              name: 'COSMOSDB_DATABASE'
+              value: cosmos::autogenDb.name
+            }
+            {
+              name: 'COSMOSDB_CONTAINER'
+              value: cosmos::autogenDb::memoryContainer.name
+            }
+            {
+              name: 'AZURE_OPENAI_ENDPOINT'
+              value: openai.properties.endpoint
+            }
+            {
+              name: 'AZURE_OPENAI_DEPLOYMENT_NAME'
+              value: openai::o3mini.name
+            }
+            {
+              name: 'AZURE_OPENAI_API_VERSION'
+              value: aoaiApiVersion
+            }
+            {
+              name: 'FRONTEND_SITE_NAME'
+              value: 'https://${format(uniqueNameFormat, 'frontend')}.azurewebsites.net'
+            }
+            {
+              name: 'APPLICATIONINSIGHTS_INSTRUMENTATION_KEY'
+              value: appInsights.properties.ConnectionString
+            }
+          ]
         }
-        //   env: [
-        //     {
-        //       name: 'COSMOSDB_ENDPOINT'
-        //       value: cosmos.properties.documentEndpoint
-        //     }
-        //     {
-        //       name: 'COSMOSDB_DATABASE'
-        //       value: cosmos::autogenDb.name
-        //     }
-        //     {
-        //       name: 'COSMOSDB_CONTAINER'
-        //       value: cosmos::autogenDb::memoryContainer.name
-        //     }
-        //     {
-        //       name: 'AZURE_OPENAI_ENDPOINT'
-        //       value: openai.properties.endpoint
-        //     }
-        //     {
-        //       name: 'AZURE_OPENAI_DEPLOYMENT_NAME'
-        //       value: openai::o3mini.name
-        //     }
-        //     {
-        //       name: 'AZURE_OPENAI_API_VERSION'
-        //       value: aoaiApiVersion
-        //     }
-        //     {
-        //       name: 'FRONTEND_SITE_NAME'
-        //       value: 'https://${format(uniqueNameFormat, 'frontend')}.azurewebsites.net'
-        //     }
-        //   ]
-        // }
       ]
     }
     

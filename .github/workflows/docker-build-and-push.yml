@@ -3,6 +3,7 @@ name: Build Docker and Optional Push
 on:
   push:
     branches:
+      - solution-architect-agents
       - main
       - dev
       - demo
@@ -14,6 +15,7 @@ on:
       - reopened
       - synchronize
     branches:
+      - solution-architect-agents
       - main
       - dev
       - demo
