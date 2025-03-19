@@ -12,6 +12,9 @@ param azureOpenAILocation string
 @description('A prefix to add to the start of all resource names. Note: A "unique" suffix will also be added')
 param prefix string = 'macae'
 
+@description('Specifies the docker container image to deploy.')
+param containerImage string = 'acrmacaelab.microsoft.com/macaebackend:latest'
+
 @description('Tags to apply to all deployed resources')
 param tags object = {}
 
@@ -270,7 +273,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'macaebackend'
-          image: backendDockerImageURL
+          image: containerImage
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
