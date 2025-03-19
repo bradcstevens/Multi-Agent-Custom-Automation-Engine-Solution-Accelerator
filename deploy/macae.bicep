@@ -13,7 +13,7 @@ param azureOpenAILocation string
 param prefix string = 'macae'
 
 @description('Specifies the docker container image to deploy.')
-param containerImage string = 'acrmacaelab.microsoft.com/macaebackend:latest'
+param containerImage string = 'acrmacaelab.azurecr.io/macaebackend:latest'
 
 @description('Tags to apply to all deployed resources')
 param tags object = {}
@@ -273,7 +273,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'macaebackend'
-          image: containerImage
+          image: '${acr.name}.azurecr.io/macaebackend:latest'
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory

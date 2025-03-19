@@ -175,19 +175,30 @@ jobs:
           set -e
           # Define variables for acr and container app names
           acr_name="${{ env.ACR_NAME }}"
-          echo "ACR name: {$acr_name}"
+          echo "ACR name: ${acr_name}"
           backend_container_app_name="macae-backend"
-          backend_build_image_tag="backend:latest"
+          backend_build_image_tag="macaebackend:latest"  # Match the name in Bicep template
 
-          echo "Building the container image..."
+          echo "Building the backend container image..."
           # Build the image
           az acr build -r ${acr_name} -t ${backend_build_image_tag} ./src/backend
           echo "Backend image build completed successfully."
 
+          # Get container app resource ID to update it
+          container_app_id=$(az container app show --resource-group ${{ env.RESOURCE_GROUP_NAME }} --name ${backend_container_app_name} --query id -o tsv)
+          if [ -n "$container_app_id" ]; then
+            echo "Updating container app with new image..."
+            az containerapp update --ids $container_app_id --image ${acr_name}.azurecr.io/${backend_build_image_tag}
+            echo "Container app updated successfully."
+          else
+            echo "Container app not found. Deployment might have failed."
+            exit 1
+          fi
+
           frontend_container_app_name="${{ env.APP_SERVICE_NAME }}"
           frontend_build_image_tag="frontend:latest"
 
-          echo "Building the container image..."
+          echo "Building the frontend container image..."
           # Build the image
           az acr build -r ${acr_name} -t ${frontend_build_image_tag} ./src/frontend
           echo "Frontend image build completed successfully."
