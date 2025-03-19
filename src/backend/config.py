@@ -35,6 +35,7 @@ class Config:
     COSMOSDB_ENDPOINT = GetRequiredConfig("COSMOSDB_ENDPOINT")
     COSMOSDB_DATABASE = GetRequiredConfig("COSMOSDB_DATABASE")
     COSMOSDB_CONTAINER = GetRequiredConfig("COSMOSDB_CONTAINER")
+    COSMOSDB_KEY = GetOptionalConfig("COSMOSDB_KEY")
 
     AZURE_OPENAI_DEPLOYMENT_NAME = GetRequiredConfig("AZURE_OPENAI_DEPLOYMENT_NAME")
     AZURE_OPENAI_MODEL_NAME = GetOptionalConfig("AZURE_OPENAI_MODEL_NAME", default=AZURE_OPENAI_DEPLOYMENT_NAME)
@@ -69,9 +70,15 @@ class Config:
     def GetCosmosDatabaseClient():
         # TODO: Today this is a single DB, we might want to support multiple DBs in the future
         if Config.__comos_client is None:
-            Config.__comos_client = CosmosClient(
-                Config.COSMOSDB_ENDPOINT, Config.GetAzureCredentials()
-            )
+            # If we have a Cosmos DB key, use that instead of Azure credentials
+            if Config.COSMOSDB_KEY:
+                Config.__comos_client = CosmosClient(
+                    Config.COSMOSDB_ENDPOINT, credential=Config.COSMOSDB_KEY
+                )
+            else:
+                Config.__comos_client = CosmosClient(
+                    Config.COSMOSDB_ENDPOINT, Config.GetAzureCredentials()
+                )
 
         if Config.__cosmos_database is None:
             Config.__cosmos_database = Config.__comos_client.get_database_client(
