@@ -106,9 +106,6 @@ resource acaAoaiRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
   }
 }
 
-
-            }
-
 resource acr 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
   name: format(uniqueShortNameFormat, 'acr')
   location: location
