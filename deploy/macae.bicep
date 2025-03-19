@@ -247,6 +247,19 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
         }
       }
       activeRevisionsMode: 'Single'
+      registries: [
+        {
+          server: acr.properties.loginServer
+          username: acr.listCredentials().username
+          passwordSecretRef: 'acr-password'
+        }
+      ]
+      secrets: [
+        {
+          name: 'acr-password'
+          value: acr.listCredentials().passwords[0].value
+        }
+      ]
     }
     template: {
       scale: {
@@ -266,7 +279,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'backend'
-          image: placeholderImage
+          image: '${acr.properties.loginServer}/backend:latest'
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
@@ -332,11 +345,19 @@ resource frontendAppService 'Microsoft.Web/sites@2021-02-01' = {
     serverFarmId: frontendAppServicePlan.id
     reserved: true
     siteConfig: {
-      linuxFxVersion:''//'DOCKER|${frontendDockerImageURL}'
+      linuxFxVersion: 'DOCKER|${acr.properties.loginServer}/frontend:latest'
       appSettings: [
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'
           value: acr.properties.loginServer
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_USERNAME'
+          value: acr.listCredentials().username
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
+          value: acr.listCredentials().passwords[0].value
         }
         {
           name: 'WEBSITES_PORT'
