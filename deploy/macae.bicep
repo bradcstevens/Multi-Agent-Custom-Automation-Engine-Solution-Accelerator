@@ -37,7 +37,7 @@ param resourceSize {
 }
 
 var appVersion = 'latest'
-var registryName = format(uniqueNameFormat, 'acr')
+var registryName = 'acrmacaelab'
 var dockerRegistryUrl = 'https://${registryName}.azurecr.io'
 
 @description('URL for frontend docker image')
@@ -269,7 +269,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
       containers: [
         {
-          name: 'backend'
+          name: 'macaebackend'
           image: backendDockerImageURL
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
