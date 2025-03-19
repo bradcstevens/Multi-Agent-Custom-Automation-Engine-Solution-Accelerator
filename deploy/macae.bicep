@@ -40,7 +40,7 @@ param resourceSize {
 // var appVersion = 'latest'
 // var resgistryName = 'acrmacaelab'
 // var dockerRegistryUrl = 'https://${resgistryName}.azurecr.io'
-var placeholderImage = 'hello-world:latest'
+// var placeholderImage = 'hello-world:latest'
 
 var uniqueNameFormat = '${prefix}-{0}-${uniqueString(resourceGroup().id, prefix)}'
 var uniqueShortNameFormat = '${toLower(prefix)}{0}${uniqueString(resourceGroup().id, prefix)}'
@@ -279,7 +279,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'backend'
-          image: '${acr.properties.loginServer}/backend:latest'
+          image: 'backend:latest'
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
