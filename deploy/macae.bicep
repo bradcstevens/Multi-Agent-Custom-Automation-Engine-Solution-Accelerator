@@ -106,6 +106,9 @@ resource acaAoaiRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
   }
 }
 
+
+            }
+
 resource acr 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
   name: format(uniqueShortNameFormat, 'acr')
   location: location
@@ -185,6 +188,7 @@ resource cosmos 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
   }
 }
 
+
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: format(uniqueNameFormat, 'containerapp')
   location: location
@@ -261,7 +265,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'backend'
-          image: 'https://${acr.properties.loginServer}/backend:latest'
+          image: 'https://${format(uniqueNameFormat, 'acr')}.azurecr.io/backend:latest'
           resources: {
             cpu: json(resourceSize.containerAppSize.cpu)
             memory: resourceSize.containerAppSize.memory
